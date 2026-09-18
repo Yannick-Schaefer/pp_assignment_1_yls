@@ -1,0 +1,8 @@
+# Example MPI hostfile for the IFI cluster.
+# Create the real `hostfile` from `/share/ifi/available-nodes.sh` output,
+# using the SAME format that script prints. One node per line; `slots=` is
+# the number of processes to place on that node (keep <= physical cores to
+# avoid oversubscription). Example:
+#
+# compute-1-1.local slots=8
+# compute-1-2.local slots=8

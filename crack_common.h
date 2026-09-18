@@ -10,7 +10,7 @@ static const char CHARSET[CHARSET_SIZE] = {
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
 };
 
-// 62^exp; fits in uint64_t for exp <= 10 (the range we ever brute-force).
+// 62^exp; fits in uint64_t for the lengths used here (exp <= 10).
 static inline uint64_t pow62(uint32_t exp) {
   uint64_t r = 1;
   for (uint32_t i = 0; i < exp; i++) r *= CHARSET_SIZE;

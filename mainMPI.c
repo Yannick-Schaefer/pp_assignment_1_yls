@@ -7,23 +7,17 @@
 #include "utils.h"
 #include "crack_common.h"
 
-// Parallel AES-256 password brute-forcer (MPI, optimization 2).
-// Rank 0 loads the ciphertext + reference checksum and distributes them via
-// MPI_Bcast (inter-process data flows through the MPI API only, never NFS).
-//
-// This final version selects both axes at run time, so one binary reproduces
-// all three milestones for the measurements:
-//   baseline      : --partition block  --sync collective
-//   optimization 1: --partition cyclic --sync collective   (better time-to-find)
-//   optimization 2: --partition cyclic --sync p2p          (this file's default)
-//
-// Optimization 2 vs. collective sync: the collective variant runs an
-// MPI_Allreduce every `interval` candidates, i.e. a global barrier whose cost
-// grows with the process count even while nobody has found anything. The p2p
-// variant does only a cheap *local* MPI_Iprobe per interval; a rank that finds
-// the password notifies the others point-to-point (MPI_Isend), and a single
-// closing MPI_Allreduce agrees on the global result and cleans up. This
-// removes the recurring global synchronization from the hot loop.
+// Parallel AES-256 password brute-forcer (MPI, final version).
+// Rank 0 loads the ciphertext and reference digest and shares them with
+// MPI_Bcast, so data between processes flows only through MPI, never NFS.
+// Flags select the milestone the measurements compare:
+//   baseline       --partition block  --sync collective
+//   optimization 1 --partition cyclic --sync collective   (better time-to-find)
+//   optimization 2 --partition cyclic --sync p2p          (default)
+// The collective sync calls MPI_Allreduce every `interval` candidates (a global
+// barrier). The p2p sync only does a local MPI_Iprobe per interval and notifies
+// the others with MPI_Isend once the password is found, so no global barrier
+// runs during the search.
 
 #define DEFAULT_ENC "./files/myfile.enc"
 #define DEFAULT_SHA "./files/myfile.sha512"

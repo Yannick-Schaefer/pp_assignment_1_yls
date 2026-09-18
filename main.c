@@ -7,25 +7,24 @@
 #include "utils.h"
 #include "crack_common.h"
 
-// Sequential AES-256 password brute-forcer (baseline for the assignment).
-// Enumerates the [0-9a-zA-Z] space with growing length until the decrypted
-// plaintext matches the reference sha512, or a benchmark mode measures the
-// raw candidate throughput over a fixed, deterministic slice of the space.
+// Sequential AES-256 password brute-forcer (baseline).
+// Tries the [0-9a-zA-Z] passwords of growing length until the decrypted text
+// matches the reference SHA-512. The benchmark mode instead scans a fixed
+// number of candidates to measure the raw throughput.
 
 #define DEFAULT_ENC "./files/myfile.enc"
 #define DEFAULT_SHA "./files/myfile.sha512"
 #define DEFAULT_MAX_LEN 6
 
-// Monotonic wall-clock seconds; accurate and unaffected by NTP steps.
+// Monotonic wall-clock seconds for accurate timing.
 static double now_seconds(void) {
   struct timespec ts;
   clock_gettime(CLOCK_MONOTONIC, &ts);
   return (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9;
 }
 
-// Full per-candidate pipeline: index -> password -> key -> decrypt -> sha512.
-// Returns 1 on a checksum match (password found), 0 otherwise. `plaintext` is
-// a caller-owned scratch buffer reused across calls to avoid per-try allocs.
+// Test one candidate: index -> password -> key -> decrypt -> SHA-512 compare.
+// Returns 1 on a match, 0 otherwise. `plaintext` is a reused scratch buffer.
 static int try_candidate(uint64_t index, uint32_t len,
                          const uint8_t *ciphertext, int32_t ciphertext_len,
                          const uint8_t *ref_checksum,

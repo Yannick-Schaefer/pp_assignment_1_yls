@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 	return 3;
   }
   int32_t cyphertext_length=encrypt(buffer1, length, key, buffer2);
-  char encname[100];
+  char encname[100] = {0}; // zero-init: strcat below needs an empty string
   // Store encrypted data
   strcat(encname,argv[1]);
   strcat(encname,".enc");

@@ -62,3 +62,9 @@ dkms.conf
 /main
 /encrypt
 /mainMPI
+
+# generated experiment output (regenerate with scripts/run_experiments.sh)
+/results/
+
+# project instructions (local only, not part of the submission)
+CLAUDE.md
