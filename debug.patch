@@ -1,0 +1,31 @@
+diff --git a/aes256.c b/aes256.c
+index cfb57d9..43c25b7 100644
+--- a/aes256.c
++++ b/aes256.c
+@@ -69,7 +69,7 @@ uint32_t decrypt(const uint8_t *ciphertext, const int32_t ciphertext_length, con
+   // Complete decryption
+   if (EVP_DecryptFinal_ex(ctx, plaintext + length, &length) <= 0) {
+ 	EVP_CIPHER_CTX_free(ctx);
+-	return -1; // Something wrong happened
++	return 0; // Something wrong happened
+   }
+   plaintext_length += length;
+   // Free context
+diff --git a/main.c b/main.c
+index 3dfae5d..3f2f08d 100644
+--- a/main.c
++++ b/main.c
+@@ -21,11 +21,11 @@ int main(int argc, char *argv[]) {
+   char password[]="abc"; // Stores the user supplied password
+   pbkdf2(password, 3, key); // Generate the AES-256 key from the password
+   uint32_t ciphertext_length = file_load("./files/myfile.enc", ciphertext); // Load encrypted file into memory
+-  file_load("/files/myfile.sha512",plaintext_checksum); // Load the original file checksum
++  file_load("./files/myfile.sha512",plaintext_checksum); // Load the original file checksum
+   int32_t plaintext_length=decrypt(ciphertext, ciphertext_length, key, plaintext); // Try to decrypt and retrieve the decripted file length
+   if(plaintext_length>=0){ // Ensure decryption succeeded
+ 	sha512sum(plaintext,plaintext_length,computed_checksum); // Compute decrypted data sha512 sum
+-	if(sha512cmp(plaintext_checksum,computed_checksum)){ // If sha512 match with the original file we succeeded
++	if(!sha512cmp(plaintext_checksum,computed_checksum)){ // If sha512 match with the original file we succeeded
+ 	  plaintext[plaintext_length]='\0'; // Make plaintext data "printable"
+ 	  printf("Encrypted file contains: %s\n",plaintext); // Print decrypted data
+ 	}

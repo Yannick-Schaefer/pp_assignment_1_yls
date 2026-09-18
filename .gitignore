@@ -53,3 +53,12 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# macOS / IDE
+.DS_Store
+.idea/
+
+# build outputs
+/main
+/encrypt
+/mainMPI
